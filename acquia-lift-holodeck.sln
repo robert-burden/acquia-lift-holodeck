@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "acquia-lift-holodeck", "Assembly-CSharp.csproj", "{C75CB045-DA9F-B80B-F85A-FD41839D6AD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "acquia-lift-holodeck", "Assembly-CSharp-Editor.csproj", "{B1786810-ACAC-1039-CF2C-663774BD6763}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C75CB045-DA9F-B80B-F85A-FD41839D6AD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75CB045-DA9F-B80B-F85A-FD41839D6AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75CB045-DA9F-B80B-F85A-FD41839D6AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75CB045-DA9F-B80B-F85A-FD41839D6AD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1786810-ACAC-1039-CF2C-663774BD6763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1786810-ACAC-1039-CF2C-663774BD6763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1786810-ACAC-1039-CF2C-663774BD6763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1786810-ACAC-1039-CF2C-663774BD6763}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
