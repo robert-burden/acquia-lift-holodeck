@@ -4,10 +4,11 @@
 var trackableBehaviour:Vuforia.TrackableBehaviour;
 var captureSendTracker:CaptureSendTracker;
 var touchIdentifier;
-var identityEmail = "chris.nagy0003@acquia.com";
+var identityName = "Neil O'Donnell";
+var trackingIdentifier;
 
 var actionToCaptures:Boo.Lang.Hash;
-var actionToPath:Boo.Lang.Hash; // starbucks, meeting, car
+var actionToPath:Boo.Lang.Hash; 
 var tagToAction:Boo.Lang.Hash;
 
 function Start () {
@@ -17,6 +18,7 @@ function Start () {
    captureSendTracker.trackableName =  trackableBehaviour.TrackableName;
    trackableBehaviour.RegisterTrackableEventHandler( captureSendTracker );
    touchIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
+   trackingIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
 
      var indoorsUpdatePersonCapture = this.GetCapture({
         'event_name': 'updatePerson',
@@ -210,7 +212,7 @@ function GetCapture(captureConfig:Boo.Lang.Hash) {
     //'post_id':'46',
     //'published_date':'1495650236',
     'author':'admin',
-    'identities' : { identityEmail : 'email' }
+    'identities' : { identityName : 'name' }
   };
   for ( var newEntry in captureConfig ) {
      defaultCaptureConfig[newEntry.Key] = newEntry.Value;
@@ -223,7 +225,7 @@ function GetPayload(scenario, payloadConfig:Boo.Lang.Hash) {
   var url = 'http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/' + scenario;
   var defaultPayloadConfig = {
     'identity_source':'tracking',
-    'identity':'HackathonIdentity00003',
+    'identity':trackingIdentifier,
     'touch_identifier':touchIdentifier,
     'url':url,
     'source':'https://lift3assets.dev.lift.acquia.com/latest/lift.js'
