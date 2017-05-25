@@ -1,0 +1,29 @@
+<!doctype html public "-//w3c//dtd html 4.01//en"
+   "http://www.w3.org/tr/html4/strict.dtd">
+<html>
+   <head>
+      <title>L3H2017</title>
+      <script src="decision-api.js"></script>
+      <script>
+         // Get API.
+         var api = AcquiaLiftDecisionApi;
+
+         // Create a capture.
+         var captureConfig = {
+            "event_name": "JavaScriptWeb Test Event"
+         };
+         var capture1 = api.getCapture(captureConfig);
+
+         // Create a list of captures.
+         var captures = [];
+         captures.push(capture1);
+
+         // Get a decision (while posting captures).
+         var payload = api.getPayload(captures);
+         api.decide(payload);
+      </script>
+   </head>
+   <body>
+      <p id="text-display">pending response ...</p>
+   </body>
+</html>
