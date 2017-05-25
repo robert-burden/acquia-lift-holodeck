@@ -1,11 +1,11 @@
 ﻿#pragma strict
 
+static var touchIdentifier;
+static var trackingIdentifier;
 
 var trackableBehaviour:Vuforia.TrackableBehaviour;
 var captureSendTracker:CaptureSendTracker;
-var touchIdentifier;
 var identityName = "Neil O'Donnell";
-var trackingIdentifier;
 
 var actionToCaptures:Boo.Lang.Hash;
 var actionToPath:Boo.Lang.Hash; 
@@ -17,9 +17,12 @@ function Start () {
    captureSendTracker = new CaptureSendTracker(this);
    captureSendTracker.trackableName =  trackableBehaviour.TrackableName;
    trackableBehaviour.RegisterTrackableEventHandler( captureSendTracker );
-   touchIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
-   trackingIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
-
+   if ( touchIdentifier == null ) {
+      touchIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
+   }
+   if ( trackingIdentifier == null ) {
+      trackingIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
+   }
      var indoorsUpdatePersonCapture = this.GetCapture({
         'event_name': 'updatePerson',
         'event_source': 'Holodeck',
@@ -96,7 +99,7 @@ function Start () {
 
    actionToPath = {
      "readStarbucksPoster" : "starbucks",
-     "posterAugmentedRealityActivated" : "starbucks",
+     "activatedStarbucksAr" : "starbucks",
      "buyStarbucksCoffee" : "starbucks",
      "readShirtAction" : "meeting",
      "activatedShirtAr" : "meeting",
@@ -116,7 +119,8 @@ function Start () {
      "buyShirt" : [shirtBuyCapture]
    };
    tagToAction = {
-      "LIFT" : "activatedShirtAr"
+      "LIFT" : "readStarbucksPoster",
+      "icon" : "activatedStarbucksAr"
    };
 }
 
