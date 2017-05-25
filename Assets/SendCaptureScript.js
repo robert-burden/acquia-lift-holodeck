@@ -4,6 +4,7 @@
 var trackableBehaviour:Vuforia.TrackableBehaviour;
 var captureSendTracker:CaptureSendTracker;
 var touchIdentifier;
+var identityEmail = "chris.nagy0003@acquia.com";
 
 var actionToCaptures:Boo.Lang.Hash;
 var actionToPath:Boo.Lang.Hash; // starbucks, meeting, car
@@ -208,7 +209,8 @@ function GetCapture(captureConfig:Boo.Lang.Hash) {
     //'page_type':'node page',
     //'post_id':'46',
     //'published_date':'1495650236',
-    'author':'admin'
+    'author':'admin',
+    'identities' : { identityEmail : 'email' }
   };
   for ( var newEntry in captureConfig ) {
      defaultCaptureConfig[newEntry.Key] = newEntry.Value;
@@ -239,7 +241,21 @@ function GetJSONOfCaptureMap(capture:Boo.Lang.Hash) {
     if ( jsonPayload != "{" ) {
         jsonPayload += ",";
     }
-    jsonPayload += "\"" + entry.Key + "\":\""+entry.Value+"\"";
+    if ( entry.Key == "identities" ) {
+       jsonPayload += "\"" + entry.Key + "\":";
+       var identitiesJson = "{";
+       var identitiesObj:Boo.Lang.Hash = entry.Value;
+       for ( var identityEntry in identitiesObj ) {
+         if ( identitiesJson != "{"  ) {
+           identitiesJson += ",";
+         }
+         identitiesJson += "\"" + identityEntry.Key + "\":\""+identityEntry.Value+"\"";;
+       }
+       identitiesJson += "}";
+       jsonPayload += identitiesJson;
+    } else {
+       jsonPayload += "\"" + entry.Key + "\":\""+entry.Value+"\"";
+    }
   }
 
   jsonPayload += "}";
@@ -269,6 +285,9 @@ function GetJSONOfMap(payload:Boo.Lang.Hash) {
        }
        capturesJson += "]";
        jsonPayload += capturesJson;
+    }
+    else if ( key == 'identities' ) {
+
     }
     else {
 
