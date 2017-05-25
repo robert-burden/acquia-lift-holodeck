@@ -7,9 +7,8 @@
     <script>
       // Set up.
       var api = AcquiaLiftDecisionApi;
-      var scenario = 'starbucks';
-      //         var scenario = 'meeting';
-      //         var scenario = 'car';
+      var identitySource = 'email';
+      var identity = 'yuan.xie.002@acquia.com';
 
       // Create captures.
       var indoorsUpdatePersonCapture = api.getCapture({
@@ -56,7 +55,7 @@
         'event_udf7': 'Unicorn Frappuccino'
       });
 
-      var tShirtTagRecognitionCapture = api.getCapture({
+      var shirtTagRecognitionCapture = api.getCapture({
         'event_name': 'Tag Recognition',
         'event_source': 'Holodeck',
         'event_udf3': '42.3601',
@@ -65,7 +64,7 @@
         'event_udf6': 'TSHIRT'
       });
 
-      var tShirtAugmentedRealityActivatedCapture = api.getCapture({
+      var shirtAugmentedRealityActivatedCapture = api.getCapture({
         'event_name':'Augmented Reality Activated',
         'event_source':'Holodeck',
         'event_udf3':'42.3601',
@@ -74,7 +73,7 @@
         'event_udf6':'TSHIRT'
       });
 
-      var tShirtCartAbandonCapture = api.getCapture({
+      var shirtCartAbandonCapture = api.getCapture({
         'event_name':'Cart Abandon',
         'event_source':'Holodeck',
         'event_udf3':'42.3601',
@@ -84,7 +83,7 @@
         'event_udf7':'Drupal T Shirt'
       });
 
-      var tShirtBuyCapture = api.getCapture({
+      var shirtBuyCapture = api.getCapture({
         'event_name':'Buy',
         'event_source':'Holodeck',
         'event_udf3':'42.3601',
@@ -94,16 +93,64 @@
         'event_udf7':'Drupal T Shirt'
       });
 
-      var captures = [indoorsUpdatePersonCapture, posterTagRecognitionCapture];
-
       // Get a decision (while posting captures).
-      var payloadConfig = {
-        'identity_source':'email',
-        'identity':'neil.odonnell001@acquia.com', // Override by your own.
-        'captures': captures
-      };
-      var payload = api.getPayload(scenario, payloadConfig);
-      api.decide(payload);
+      var readStarbucksPosterAction = api.getPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [indoorsUpdatePersonCapture,posterTagRecognitionCapture]
+      });
+
+      var activatedStarbucksArAction = api.getPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [posterAugmentedRealityActivatedCapture]
+      });
+
+      var buyStarbucksCoffeeAction = api.getPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [unicornFrappuccinoBuyCapture]
+      });
+
+      var readShirtAction = api.getPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtTagRecognitionCapture]
+      });
+
+      var activatedShirtArAction = api.getPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtAugmentedRealityActivatedCapture]
+      });
+
+      var abandonBuyShirtAction = api.getPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtCartAbandonCapture]
+      });
+
+      var parkingLotUpdatePersonCapture = api.getPayload('car', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [parkingLotUpdatePersonCapture]
+      });
+
+      var buyShirtAction = api.getPayload('car', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtBuyCapture]
+      });
+
+      // Decides.
+      api.decide(readStarbucksPosterAction);
+      api.decide(activatedStarbucksArAction);
+      api.decide(buyStarbucksCoffeeAction);
+      api.decide(readShirtAction);
+      api.decide(activatedShirtArAction);
+      api.decide(abandonBuyShirtAction);
+      api.decide(parkingLotUpdatePersonCapture);
+      api.decide(buyShirtAction);
     </script>
 </head>
 <body>
