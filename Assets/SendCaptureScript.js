@@ -1,9 +1,13 @@
 ﻿#pragma strict
-import System.Collections.Generic;
+
 
 var trackableBehaviour:Vuforia.TrackableBehaviour;
 var captureSendTracker:CaptureSendTracker;
 var touchIdentifier;
+
+var actionToCaptures:Boo.Lang.Hash;
+var actionToPath:Boo.Lang.Hash; // starbucks, meeting, car
+var tagToAction:Boo.Lang.Hash;
 
 function Start () {
    Debug.Log("Start Default Capture Script");	
@@ -11,12 +15,183 @@ function Start () {
    captureSendTracker = new CaptureSendTracker(this);
    captureSendTracker.trackableName =  trackableBehaviour.TrackableName;
    trackableBehaviour.RegisterTrackableEventHandler( captureSendTracker );
-   touchIdentifier = System.Guid.NewGuid().ToString();
+   touchIdentifier = System.Guid.NewGuid().ToString().Replace('-','').Substring(0,16);
+
+     var indoorsUpdatePersonCapture = this.GetCapture({
+        'event_name': 'updatePerson',
+        'event_source': 'Holodeck',
+        'person_udf4': '30',
+        'person_udf5': 'Male',
+        'person_udf6': 'Cambridgeside Galleria Indoors'
+      });
+      var parkingLotUpdatePersonCapture = this.GetCapture({
+        'event_name': 'updatePerson',
+        'event_source': 'Holodeck',
+        'person_udf4': '30',
+        'person_udf5': 'Male',
+        'person_udf6': 'Cambridgeside Galleria Parking Lot'
+      });
+      var posterTagRecognitionCapture = this.GetCapture({
+        'event_name': 'Tag Recognition',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'POSTER'
+      });
+      var posterAugmentedRealityActivatedCapture = this.GetCapture({
+        'event_name':'Augmented Reality Activated',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Indoors',
+        'event_udf6':'POSTER'
+      });
+      var unicornFrappuccinoBuyCapture = this.GetCapture({
+        'event_name': 'Buy',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'POSTER',
+        'event_udf7': 'Unicorn Frappuccino'
+      });
+      var shirtTagRecognitionCapture =this.GetCapture({
+        'event_name': 'Tag Recognition',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'TSHIRT'
+      });
+      var shirtAugmentedRealityActivatedCapture = this.GetCapture({
+        'event_name':'Augmented Reality Activated',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Indoors',
+        'event_udf6':'TSHIRT'
+      });
+      var shirtCartAbandonCapture = this.GetCapture({
+        'event_name':'Cart Abandon',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Parking Lot',
+        'event_udf6':'TSHIRT',
+        'event_udf7':'Drupal T Shirt'
+      });
+      var shirtBuyCapture = this.GetCapture({
+        'event_name':'Buy',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Parking Lot',
+        'event_udf6':'TSHIRT',
+        'event_udf7':'Drupal T Shirt'
+      });
+
+   actionToPath = {
+     "readStarbucksPoster" : "starbucks",
+     "posterAugmentedRealityActivated" : "starbucks",
+     "buyStarbucksCoffee" : "starbucks",
+     "readShirtAction" : "meeting",
+     "activatedShirtAr" : "meeting",
+     "abandonBuyShirt" : "meeting",
+     "parkingLotUpdatePerson" : "car",
+     "buyShirt" : "car"
+   };
+
+   actionToCaptures = {
+     "readStarbucksPoster" : [indoorsUpdatePersonCapture,posterTagRecognitionCapture],
+     "activatedStarbucksAr" : [posterAugmentedRealityActivatedCapture],
+     "buyStarbucksCoffee" : [unicornFrappuccinoBuyCapture],
+     "readShirtAction" : [shirtTagRecognitionCapture],
+     "activatedShirtAr" : [shirtAugmentedRealityActivatedCapture],
+     "abandonBuyShirt" : [shirtCartAbandonCapture],
+     "parkingLotUpdatePerson" : [parkingLotUpdatePersonCapture],
+     "buyShirt" : [shirtBuyCapture]
+   };
+   tagToAction = {
+      "LIFT" : "activatedShirtAr"
+   };
 }
 
 function Update () {
 
 }
+
+function SendCaptureApiByAction(action) {
+         var scenario = actionToPath[action];
+         var captures:Boo.Lang.Hash[] = actionToCaptures[action];
+
+         // Get a decision (while posting captures).
+         var payloadConfig = {
+           // 'identity':'73ESltNk6AEHBVi1nWiApx', // Override by your own if needed.
+           'captures': captures
+         };
+         var payload = this.GetPayload(scenario, payloadConfig);
+  // Configure local caller script.
+  var method = 'POST';
+  var path = 'https://eu-central-1-rc-decisionapi.dev.lift.acquia.com/decide?account_id=HOLODECK&site_id=holodeck&version=1.10.4';
+  // path = "http://httpbin.org/post";
+  var body = this.GetJSONOfMap(payload);
+  Debug.Log("Decide request "+body);
+
+  // Create and configure the request.
+  var request = new Networking.UnityWebRequest(path, Networking.UnityWebRequest.kHttpVerbPOST);
+  // Temp body
+  var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
+  var uH= new Networking.UploadHandlerRaw(bodyBytes);
+  uH.contentType= "application/json";
+  request.uploadHandler= uH;
+  request.SetRequestHeader( "Content-Type", "application/json" );
+  request.downloadHandler = new Networking.DownloadHandlerBuffer();
+  yield request.Send();
+  Debug.Log(request.downloadHandler.text);
+}
+
+function SendCaptureApi(tagName) {
+         var action = tagToAction[tagName];
+         var scenario = actionToPath[action];
+         var captures:Boo.Lang.Hash[] = actionToCaptures[action];
+
+         // Get a decision (while posting captures).
+         var payloadConfig = {
+           // 'identity':'73ESltNk6AEHBVi1nWiApx', // Override by your own if needed.
+           'captures': captures
+         };
+         var payload = this.GetPayload(scenario, payloadConfig);
+  // Configure local caller script.
+  var method = 'POST';
+  var path = 'https://eu-central-1-rc-decisionapi.dev.lift.acquia.com/decide?account_id=HOLODECK&site_id=holodeck&version=1.10.4';
+  // path = "http://httpbin.org/post";
+  var body = this.GetJSONOfMap(payload);
+  Debug.Log("Decide request "+body);
+
+  // Create and configure the request.
+  var request = new Networking.UnityWebRequest(path, Networking.UnityWebRequest.kHttpVerbPOST);
+  // Temp body
+  var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
+  var uH= new Networking.UploadHandlerRaw(bodyBytes);
+  uH.contentType= "application/json";
+  request.uploadHandler= uH;
+  request.SetRequestHeader( "Content-Type", "application/json" );
+  request.downloadHandler = new Networking.DownloadHandlerBuffer();
+  yield request.Send();
+  Debug.Log(request.downloadHandler.text);
+  var responseContents = request.downloadHandler.text;
+  //  "content_id":"136c6959-cfb7-4dbd-8589-54c135b22547",
+  var contentIdKey = "\"content_id\":";
+  var contentIdStart = responseContents.IndexOf(contentIdKey);
+  if ( contentIdStart != -1 ) {
+    var contentIdEnd = responseContents.IndexOf(",", contentIdStart);
+    var contentId = responseContents.Substring(contentIdStart+contentIdKey.length+1, contentIdEnd - contentIdStart - contentIdKey.length - 2);
+    Debug.Log("Content Id = "+contentId);
+  }
+      
+   }
+
 
 function GetCapture(captureConfig:Boo.Lang.Hash) {
   var defaultCaptureConfig = {
@@ -46,7 +221,7 @@ function GetPayload(scenario, payloadConfig:Boo.Lang.Hash) {
   var url = 'http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/' + scenario;
   var defaultPayloadConfig = {
     'identity_source':'tracking',
-    'identity':'HackathonIdentity00002',
+    'identity':'HackathonIdentity00003',
     'touch_identifier':touchIdentifier,
     'url':url,
     'source':'https://lift3assets.dev.lift.acquia.com/latest/lift.js'
@@ -119,7 +294,7 @@ class CaptureSendTracker extends Networking.DownloadHandlerScript implements Vuf
            newStatus == Vuforia.TrackableBehaviour.Status.EXTENDED_TRACKED)
       {
          Debug.Log("Found = "+trackableName);
-         sendCaptureScript.StartCoroutine( SendCaptureApi(trackableName) );
+         sendCaptureScript.StartCoroutine( sendCaptureScript.SendCaptureApi(trackableName) );
       }
       else
       {
@@ -127,33 +302,132 @@ class CaptureSendTracker extends Networking.DownloadHandlerScript implements Vuf
       }
    }
 
-   function SendCaptureApi(tagName) {
-         var scenario = 'starbucks';
-//         var scenario = 'meeting';
-//         var scenario = 'car';
+   function SendAllCaptureApi(tagName) {
+   var identitySource = "tracking";
+   var identity = "Holodeck00ALL";
+     var indoorsUpdatePersonCapture = sendCaptureScript.GetCapture({
+        'event_name': 'updatePerson',
+        'event_source': 'Holodeck',
+        'person_udf4': '30',
+        'person_udf5': 'Male',
+        'person_udf6': 'Cambridgeside Galleria Indoors'
+      });
+      var parkingLotUpdatePersonCapture = sendCaptureScript.GetCapture({
+        'event_name': 'updatePerson',
+        'event_source': 'Holodeck',
+        'person_udf4': '30',
+        'person_udf5': 'Male',
+        'person_udf6': 'Cambridgeside Galleria Parking Lot'
+      });
+      var posterTagRecognitionCapture = sendCaptureScript.GetCapture({
+        'event_name': 'Tag Recognition',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'POSTER'
+      });
+      var posterAugmentedRealityActivatedCapture = sendCaptureScript.GetCapture({
+        'event_name':'Augmented Reality Activated',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Indoors',
+        'event_udf6':'POSTER'
+      });
+      var unicornFrappuccinoBuyCapture = sendCaptureScript.GetCapture({
+        'event_name': 'Buy',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'POSTER',
+        'event_udf7': 'Unicorn Frappuccino'
+      });
+      var shirtTagRecognitionCapture =sendCaptureScript.GetCapture({
+        'event_name': 'Tag Recognition',
+        'event_source': 'Holodeck',
+        'event_udf3': '42.3601',
+        'event_udf4': '71.0589',
+        'event_udf5': 'Cambridgeside Galleria Indoors',
+        'event_udf6': 'TSHIRT'
+      });
+      var shirtAugmentedRealityActivatedCapture = sendCaptureScript.GetCapture({
+        'event_name':'Augmented Reality Activated',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Indoors',
+        'event_udf6':'TSHIRT'
+      });
+      var shirtCartAbandonCapture = sendCaptureScript.GetCapture({
+        'event_name':'Cart Abandon',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Parking Lot',
+        'event_udf6':'TSHIRT',
+        'event_udf7':'Drupal T Shirt'
+      });
+      var shirtBuyCapture = sendCaptureScript.GetCapture({
+        'event_name':'Buy',
+        'event_source':'Holodeck',
+        'event_udf3':'42.3601',
+        'event_udf4':'71.0589',
+        'event_udf5':'Cambridgeside Galleria Parking Lot',
+        'event_udf6':'TSHIRT',
+        'event_udf7':'Drupal T Shirt'
+      });
+      // Get a decision (while posting captures).
+      var readStarbucksPosterAction = sendCaptureScript.GetPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [indoorsUpdatePersonCapture,posterTagRecognitionCapture]
+      });
+      var activatedStarbucksArAction = sendCaptureScript.GetPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [posterAugmentedRealityActivatedCapture]
+      });
+      var buyStarbucksCoffeeAction = sendCaptureScript.GetPayload('starbucks', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [unicornFrappuccinoBuyCapture]
+      });
+      var readShirtAction = sendCaptureScript.GetPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtTagRecognitionCapture]
+      });
+      var activatedShirtArAction = sendCaptureScript.GetPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtAugmentedRealityActivatedCapture]
+      });
+      var abandonBuyShirtAction = sendCaptureScript.GetPayload('meeting', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtCartAbandonCapture]
+      });
+      var parkingLotUpdatePersonCaptureAction = sendCaptureScript.GetPayload('car', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [parkingLotUpdatePersonCapture]
+      });
+      var buyShirtAction = sendCaptureScript.GetPayload('car', {
+        'identity_source':identitySource,
+        'identity':identity,
+        'captures': [shirtBuyCapture]
+      });
 
-         // Create capture 1 - galleria.
-         var captureConfig1 = {
-           'event_name':'updatePerson',
-           'event_source':'Holodeck',
-           'person_udf4':'30',
-           'person_udf5':'Male',
-           'person_udf6': 'Cambridgeside Galleria Indoors'
-         };
-         var capture1 = sendCaptureScript.GetCapture(captureConfig1);
-         var captures = [ capture1];
-
-         // Get a decision (while posting captures).
-         var payloadConfig = {
-           // 'identity':'73ESltNk6AEHBVi1nWiApx', // Override by your own if needed.
-           'captures': captures
-         };
-         var payload = sendCaptureScript.GetPayload(scenario, payloadConfig);
-  // Configure local caller script.
-  var method = 'POST';
+      var actionsToSend = [ readStarbucksPosterAction, activatedStarbucksArAction, buyStarbucksCoffeeAction, 
+        readShirtAction, activatedShirtArAction, abandonBuyShirtAction, parkingLotUpdatePersonCaptureAction,
+        buyShirtAction ];
+      for ( var actionToSend in actionsToSend ) {
+var method = 'POST';
   var path = 'https://eu-central-1-rc-decisionapi.dev.lift.acquia.com/decide?account_id=HOLODECK&site_id=holodeck&version=1.10.4';
   // path = "http://httpbin.org/post";
-  var body = sendCaptureScript.GetJSONOfMap(payload);
+  var body = sendCaptureScript.GetJSONOfMap(actionToSend);
   Debug.Log("Decide request "+body);
 
   // Create and configure the request.
@@ -167,8 +441,23 @@ class CaptureSendTracker extends Networking.DownloadHandlerScript implements Vuf
   request.downloadHandler = new Networking.DownloadHandlerBuffer();
   yield request.Send();
   Debug.Log(request.downloadHandler.text);
+  var responseContents = request.downloadHandler.text;
+  //  "content_id":"136c6959-cfb7-4dbd-8589-54c135b22547",
+  var contentIdKey = "\"content_id\":";
+  var contentIdStart = responseContents.IndexOf(contentIdKey);
+  if ( contentIdStart != -1 )  {
+  var contentIdEnd = responseContents.IndexOf(",", contentIdStart);
+  var contentId = responseContents.Substring(contentIdStart+contentIdKey.length+1, contentIdEnd - contentIdStart - contentIdKey.length - 2);
+  Debug.Log("Content Id = "+contentId);
+  }
+ 
+
+      }
    }
 
+
+   
+   /*
    function SendCaptureUnityWebRequest(tagName) {
         var request = new Networking.UnityWebRequest("https://eu-central-1-rc-decisionapi.dev.lift.acquia.com/decide", Networking.UnityWebRequest.kHttpVerbPOST);
         var bytes = System.Text.Encoding.UTF8.GetBytes("{\"captures\":[]}");
@@ -180,7 +469,7 @@ class CaptureSendTracker extends Networking.DownloadHandlerScript implements Vuf
         yield request.Send();
         Debug.Log(request.downloadHandler.text);
    }
-
+   */
 }
 
 
