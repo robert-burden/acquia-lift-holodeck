@@ -1,11 +1,11 @@
 var AcquiaLiftDecisionApi = AcquiaLiftDecisionApi || {};
 
 AcquiaLiftDecisionApi.getCapture = AcquiaLiftDecisionApi.getCapture || function (captureConfig) {
-  var defaultCapture = {
+  var defaultCaptureConfig = {
     "event_name":"Content View",
     "event_source":"Web",
-    "content_title":"Starbucks",
-    "url":"http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/starbucks",
+    "content_title":"Holodeck content",
+    "url":"http://holodeck.com",
     "referral_url":"",
     "user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3109.0 Safari/537.36",
     "client_timezone":"240",
@@ -17,22 +17,21 @@ AcquiaLiftDecisionApi.getCapture = AcquiaLiftDecisionApi.getCapture || function 
     "published_date":"1495650236",
     "author":"admin"
   };
-
-  return Object.assign(defaultCapture, captureConfig);
+  return Object.assign(defaultCaptureConfig, captureConfig);
 };
 
 // Get a payload.
-AcquiaLiftDecisionApi.getPayload = AcquiaLiftDecisionApi.getPayload || function (captures) {
-  var payload = {
+AcquiaLiftDecisionApi.getPayload = AcquiaLiftDecisionApi.getPayload || function (scenario, payloadConfig) {
+  var url = "http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/" + scenario;
+  var defaultPayloadConfig = {
     "identity_source":"tracking",
-    "identity":"73ESltNk6AEHBVi1nWiApx",
-    "identity_expiry":1558725782774,
-    "touch_identifier":"vMKrujuzs4ZK4RCpoNJt4",
-    "url":"http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/starbucks",
+    "identity":"HackathonIdentity00001",
+    "identity_expiry":Date.now(),
+    "touch_identifier":Math.random().toString(36).substring(2),
+    "url":url,
     "source":"https://lift3assets.dev.lift.acquia.com/latest/lift.js"
   };
-  payload.captures = captures;
-  return payload;
+  return Object.assign(defaultPayloadConfig, payloadConfig);
 };
 
 // Call decide endpoint.

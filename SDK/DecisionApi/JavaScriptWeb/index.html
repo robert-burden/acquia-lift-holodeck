@@ -5,21 +5,37 @@
       <title>L3H2017</title>
       <script src="decision-api.js"></script>
       <script>
-         // Get API.
+         // Set up.
          var api = AcquiaLiftDecisionApi;
+         var captures = [];
+         var scenario = 'starbucks';
+//         var scenario = 'meeting';
+//         var scenario = 'car';
 
-         // Create a capture.
-         var captureConfig = {
+         // Create capture 0 - testing.
+         var captureConfig0 = {
             "event_name": "JavaScriptWeb Test Event"
          };
-         var capture1 = api.getCapture(captureConfig);
+         var capture0 = api.getCapture(captureConfig0);
+         captures.push(capture0);
 
-         // Create a list of captures.
-         var captures = [];
+         // Create capture 1 - galleria.
+         var captureConfig1 = {
+           "event_name":"updatePerson",
+           "event_source":"Holodeck",
+           "person_udf4":"30",
+           "person_udf5":"Male",
+           "person_udf6": "Cambridgeside Galleria Indoors"
+         };
+         var capture1 = api.getCapture(captureConfig1);
          captures.push(capture1);
 
          // Get a decision (while posting captures).
-         var payload = api.getPayload(captures);
+         var payloadConfig = {
+           // "identity":"73ESltNk6AEHBVi1nWiApx", // Override by your own if needed.
+           "captures": captures
+         };
+         var payload = api.getPayload(scenario, payloadConfig);
          api.decide(payload);
       </script>
    </head>
