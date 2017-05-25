@@ -61,6 +61,7 @@ AcquiaLiftDecisionApi.decide = AcquiaLiftDecisionApi.decide || function (payload
   };
 
   request.open(method, path, true);
+  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
   // Send the request.
   request.send(body);
