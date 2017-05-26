@@ -125,11 +125,15 @@ function InitMaps() {
     };
     tagToAction = {
         "LIFT": "readStarbucksPoster",
-        "icon": "readShirtAction"
+        "icon": "readShirtAction",
+        "POSTER": "readStarbucksPoster",
+        "TSHIRT": "readShirtAction"
     };
     tagToDecisionAction = {
         "LIFT": "activatedStarbucksAr",
-        "icon": "activatedShirtAr"
+        "icon": "activatedShirtAr",
+        "POSTER":"activatedStarbucksAr",
+        "TSHIRT":"activatedShirtAr"
     };
 }
 
