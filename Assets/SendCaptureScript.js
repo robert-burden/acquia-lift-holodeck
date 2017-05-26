@@ -18,6 +18,10 @@ function Start() {
     captureSendTracker = new CaptureSendTracker(this);
     captureSendTracker.trackableName = trackableBehaviour.TrackableName;
     trackableBehaviour.RegisterTrackableEventHandler(captureSendTracker);
+    this.InitMaps();
+}
+
+function InitMaps() {
     if (touchIdentifier == null) {
         touchIdentifier = System.Guid.NewGuid().ToString().Replace('-', '').Substring(0, 16);
     }
