@@ -208,7 +208,7 @@ function SendCaptureApi(tagName) {
             // Get a decision (while posting captures).
             var decisionPayloadConfig = {
                 // 'identity':'73ESltNk6AEHBVi1nWiApx', // Override by your own if needed.
-                'captures': captures
+                'captures': decisionCaptures
             };
             var decisionPayload = this.GetPayload(scenario, decisionPayloadConfig);
             // Configure local caller script.
