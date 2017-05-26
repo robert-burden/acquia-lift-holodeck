@@ -25,8 +25,7 @@ AcquiaLiftDecisionApi.getPayload = AcquiaLiftDecisionApi.getPayload || function 
   var url = 'http://lift3shay2ws7hd7d5ke.devcloud.acquia-sites.com/host/' + scenario;
   var defaultPayloadConfig = {
     'identity_source':'tracking',
-    'identity_source':'email',
-    'identity':'HackathonIdentity00001',
+    'identity':'DefaultHackathonIdentity',
     'identity_expiry':Date.now(),
     'touch_identifier':Math.random().toString(36).substring(2),
     'url':url,
